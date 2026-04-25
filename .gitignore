@@ -1,0 +1,39 @@
+# Data and generated artifacts
+data/
+outputs/
+kaggle_config/
+
+# Model checkpoints and arrays
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.npz
+*.npy
+
+# Python cache and environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+.env
+
+# Logs and experiment tracking
+*.log
+runs/
+wandb/
+tensorboard/
+
+# Local extraction/temp files
+docs/manuscript_file_extracted.txt
+~$*.docx
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

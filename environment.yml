@@ -1,0 +1,34 @@
+name: covid-screening
+
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+
+dependencies:
+  - python=3.10
+
+  - pytorch=2.2
+  - torchvision=0.17
+  - pytorch-cuda=12.1
+
+  - numpy
+  - scipy
+  - pandas
+  - scikit-image
+  - opencv
+  - matplotlib
+
+  - simpleitk
+  - nibabel
+  - pydicom
+
+  - tqdm
+  - scikit-learn
+
+  - pip
+
+  - pip:
+      - kaggle
+      - tensorboard
+      - monai
