@@ -14,7 +14,39 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from src.datasets.qata_npz import QaTaNPZDataset
-from src.models.transunet2d_v11 import build_transunet2d_v11
+from src.models.model_factory import ModelBuildConfig, build_model
+
+
+def build_named_model(name: str):
+    name = name.strip().lower()
+    if name in ("transunet2d_v11", "transunet_v11", "transunet2dv11"):
+        from src.models.transunet2d_v11 import build_transunet2d_v11
+        return build_transunet2d_v11(in_channels=1, out_channels=1)
+    if name in ("transunet2d_v12", "transunet_v12", "transunet2dv12"):
+        from src.models.transunet2d_v12 import build_transunet2d_v12
+        return build_transunet2d_v12(in_channels=1, out_channels=1)
+    if name in ("transunet2d_v13", "transunet_v13", "transunet2dv13"):
+        from src.models.transunet2d_v13 import build_transunet2d_v13
+        return build_transunet2d_v13(in_channels=1, out_channels=1)
+    if name in ("transunet2d_v14", "transunet_v14", "transunet2dv14"):
+        from src.models.transunet2d_v14 import build_transunet2d_v14
+        return build_transunet2d_v14(in_channels=1, out_channels=1)
+    if name in ("transunet2d_v16", "transunet_v16", "transunet2dv16"):
+        from src.models.transunet2d_v16 import build_transunet2d_v16
+        return build_transunet2d_v16(in_channels=1, out_channels=1)
+    if name in ("transunet2d_v17", "transunet_v17", "transunet2dv17"):
+        from src.models.transunet2d_v17 import build_transunet2d_v17
+        return build_transunet2d_v17(in_channels=1, out_channels=1)
+    if name in ("transunet2d_v18", "transunet_v18", "transunet2dv18"):
+        from src.models.transunet2d_v18 import build_transunet2d_v18
+        return build_transunet2d_v18(in_channels=1, out_channels=1)
+    if name in ("transunet2d_v19", "transunet_v19", "transunet2dv19"):
+        from src.models.transunet2d_v19 import build_transunet2d_v19
+        return build_transunet2d_v19(in_channels=1, out_channels=1)
+    if name in ("transunet2d_v20", "transunet_v20", "transunet2dv20"):
+        from src.models.transunet2d_v20 import build_transunet2d_v20
+        return build_transunet2d_v20(in_channels=1, out_channels=1)
+    return build_model(ModelBuildConfig(name=name, in_channels=1, out_channels=1))
 
 
 def dice_iou_precision_recall(pred: np.ndarray, gt: np.ndarray) -> tuple[float, float, float, float]:
@@ -55,7 +87,7 @@ def load_probabilities(args: argparse.Namespace) -> tuple[np.ndarray, np.ndarray
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"device={device}")
 
-    model = build_transunet2d_v11(in_channels=1, out_channels=1).to(device)
+    model = build_named_model(args.model).to(device)
     ckpt = torch.load(args.ckpt, map_location="cpu")
     model.load_state_dict(ckpt["model"])
     model.eval()
@@ -100,6 +132,7 @@ def predict_logits(model: torch.nn.Module, x: torch.Tensor, tta_mode: str) -> to
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_dir", default="data/processed/qata")
+    parser.add_argument("--model", default="transunet2d_v11")
     parser.add_argument("--ckpt", default="outputs/transunet2d_v11_qata_exp_best.pt")
     parser.add_argument("--split", default="val", choices=("train", "val", "test"))
     parser.add_argument("--batch", type=int, default=64)

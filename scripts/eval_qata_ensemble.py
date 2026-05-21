@@ -45,6 +45,30 @@ def metrics(pred: np.ndarray, gt: np.ndarray) -> tuple[float, float, float, floa
 def build_named_model(name: str):
     if name == "transunet2d_v11":
         return build_transunet2d_v11(in_channels=1, out_channels=1)
+    if name == "transunet2d_v12":
+        from src.models.transunet2d_v12 import build_transunet2d_v12
+        return build_transunet2d_v12(in_channels=1, out_channels=1)
+    if name == "transunet2d_v13":
+        from src.models.transunet2d_v13 import build_transunet2d_v13
+        return build_transunet2d_v13(in_channels=1, out_channels=1)
+    if name == "transunet2d_v14":
+        from src.models.transunet2d_v14 import build_transunet2d_v14
+        return build_transunet2d_v14(in_channels=1, out_channels=1)
+    if name == "transunet2d_v16":
+        from src.models.transunet2d_v16 import build_transunet2d_v16
+        return build_transunet2d_v16(in_channels=1, out_channels=1)
+    if name == "transunet2d_v17":
+        from src.models.transunet2d_v17 import build_transunet2d_v17
+        return build_transunet2d_v17(in_channels=1, out_channels=1)
+    if name == "transunet2d_v18":
+        from src.models.transunet2d_v18 import build_transunet2d_v18
+        return build_transunet2d_v18(in_channels=1, out_channels=1)
+    if name == "transunet2d_v19":
+        from src.models.transunet2d_v19 import build_transunet2d_v19
+        return build_transunet2d_v19(in_channels=1, out_channels=1)
+    if name == "transunet2d_v20":
+        from src.models.transunet2d_v20 import build_transunet2d_v20
+        return build_transunet2d_v20(in_channels=1, out_channels=1)
     return build_model(ModelBuildConfig(name=name, in_channels=1, out_channels=1))
 
 

@@ -25,6 +25,15 @@ def available_models() -> Sequence[str]:
         "swin_unet2d",
         "uctransnet2d",
         "lavt2d",
+        "transunet2d_v13",
+        "transunet2d_v14",
+        "transunet2d_v16",
+        "transunet2d_v17",
+        "transunet2d_v18",
+        "transunet2d_v19",
+        "transunet2d_v20",
+        "lowdice_refinenet2d",
+        "lowdice_prior_refinenet2d",
     )
 
 
@@ -41,6 +50,25 @@ _ALIASES: Dict[str, str] = {
     "swinunet": "swin_unet2d",
     "uctransnet": "uctransnet2d",
     "lavt": "lavt2d",
+    "transunet_v13": "transunet2d_v13",
+    "transunet2dv13": "transunet2d_v13",
+    "transunet_v14": "transunet2d_v14",
+    "transunet2dv14": "transunet2d_v14",
+    "transunet_v16": "transunet2d_v16",
+    "transunet2dv16": "transunet2d_v16",
+    "transunet_v17": "transunet2d_v17",
+    "transunet2dv17": "transunet2d_v17",
+    "transunet_v18": "transunet2d_v18",
+    "transunet2dv18": "transunet2d_v18",
+    "transunet_v19": "transunet2d_v19",
+    "transunet2dv19": "transunet2d_v19",
+    "transunet_v20": "transunet2d_v20",
+    "transunet2dv20": "transunet2d_v20",
+    "lowdice_refinenet": "lowdice_refinenet2d",
+    "lowdice": "lowdice_refinenet2d",
+    "lowdice_specialist": "lowdice_refinenet2d",
+    "lowdice_prior_refinenet": "lowdice_prior_refinenet2d",
+    "lowdice_prior": "lowdice_prior_refinenet2d",
 }
 
 
@@ -86,6 +114,68 @@ def build_model(cfg: ModelBuildConfig) -> nn.Module:
             in_channels=cfg.in_channels,
             out_channels=cfg.out_channels,
             prompt=cfg.prompt or "covid-19 infection region",
+        )
+
+    if name == "transunet2d_v13":
+        from src.models.transunet2d_v13 import build_transunet2d_v13
+        return build_transunet2d_v13(
+            in_channels=cfg.in_channels,
+            out_channels=cfg.out_channels,
+        )
+
+    if name == "transunet2d_v14":
+        from src.models.transunet2d_v14 import build_transunet2d_v14
+        return build_transunet2d_v14(
+            in_channels=cfg.in_channels,
+            out_channels=cfg.out_channels,
+        )
+
+    if name == "transunet2d_v16":
+        from src.models.transunet2d_v16 import build_transunet2d_v16
+        return build_transunet2d_v16(
+            in_channels=cfg.in_channels,
+            out_channels=cfg.out_channels,
+        )
+
+    if name == "transunet2d_v17":
+        from src.models.transunet2d_v17 import build_transunet2d_v17
+        return build_transunet2d_v17(
+            in_channels=cfg.in_channels,
+            out_channels=cfg.out_channels,
+        )
+
+    if name == "transunet2d_v18":
+        from src.models.transunet2d_v18 import build_transunet2d_v18
+        return build_transunet2d_v18(
+            in_channels=cfg.in_channels,
+            out_channels=cfg.out_channels,
+        )
+
+    if name == "transunet2d_v19":
+        from src.models.transunet2d_v19 import build_transunet2d_v19
+        return build_transunet2d_v19(
+            in_channels=cfg.in_channels,
+            out_channels=cfg.out_channels,
+        )
+
+    if name == "transunet2d_v20":
+        from src.models.transunet2d_v20 import build_transunet2d_v20
+        return build_transunet2d_v20(
+            in_channels=cfg.in_channels,
+            out_channels=cfg.out_channels,
+        )
+
+    if name == "lowdice_refinenet2d":
+        from src.models.lowdice_refinenet2d import build_lowdice_refinenet2d
+        return build_lowdice_refinenet2d(
+            in_channels=cfg.in_channels,
+            out_channels=cfg.out_channels,
+        )
+
+    if name == "lowdice_prior_refinenet2d":
+        from src.models.lowdice_refinenet2d import build_lowdice_prior_refinenet2d
+        return build_lowdice_prior_refinenet2d(
+            out_channels=cfg.out_channels,
         )
 
     raise ValueError(

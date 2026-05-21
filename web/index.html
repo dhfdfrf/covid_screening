@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>V15 Chest Segmentation</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <span class="eyebrow">COVID Screening / Local Web App</span>
+          <h1>V15 胸片感染区域分割</h1>
+          <p>
+            上传胸片图像，在浏览器中直接调用你项目里的 <code>v15 融合配置</code>，也可以手动切换 v12/v13/v14/v16/v17/v18/v19/v20 权重。
+            如果再附上真值掩码，页面会额外显示 Dice、IoU、Precision、Recall 和误差图。
+          </p>
+        </div>
+        <div class="hero-card">
+          <div class="hero-card-label">Checkpoint</div>
+          <div class="hero-card-value" id="default-checkpoint">Loading...</div>
+          <div class="hero-card-note">默认使用本地 v15 融合配置；如需对比，也可以在下方手动切换 v12/v13/v14/v16/v17/v18/v19/v20 权重。</div>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <section class="control-panel">
+          <div class="panel-head">
+            <h2>输入与参数</h2>
+            <p>本地运行。文件不会上传到外部服务器。</p>
+          </div>
+
+          <form id="segment-form" class="control-form">
+            <label class="field field-upload">
+              <span>胸片文件</span>
+              <input id="image-file" name="image_file" type="file" accept=".png,.jpg,.jpeg,.bmp,.tif,.tiff,.dcm,.dicom" required>
+              <div class="dropzone" id="image-dropzone">
+                <strong>拖拽胸片到这里</strong>
+                <span>或点击上方选择文件</span>
+                <em id="file-name">未选择文件</em>
+              </div>
+            </label>
+
+            <label class="field field-upload">
+              <span>真值 Mask（可选，通常可自动匹配）</span>
+              <input id="gt-mask-file" name="gt_mask_file" type="file" accept=".png,.jpg,.jpeg,.bmp,.tif,.tiff">
+              <div class="dropzone compact" id="gt-dropzone">
+                <strong>可选上传标注 mask</strong>
+                <span>不上传时会尝试从本地 QaTa 数据集自动查找</span>
+                <em id="gt-file-name">未选择真值文件</em>
+              </div>
+            </label>
+
+            <label class="field">
+              <span>Checkpoint 路径</span>
+              <input id="checkpoint-path" name="checkpoint_path" type="text" placeholder="configs/v15_ensemble_config.json" list="checkpoint-list">
+              <datalist id="checkpoint-list"></datalist>
+            </label>
+
+            <div class="grid">
+              <label class="field">
+                <span>输入尺寸</span>
+                <input name="image_size" type="number" min="64" step="1" value="224">
+              </label>
+              <label class="field">
+                <span>阈值</span>
+                <input name="threshold" type="number" min="0" max="1" step="0.01" value="0.49">
+              </label>
+              <label class="field">
+                <span>最小区域</span>
+                <input name="min_area" type="number" min="0" step="1" value="0">
+              </label>
+              <label class="field">
+                <span>TTA</span>
+                <select name="tta_mode">
+                  <option value="none">none</option>
+                  <option value="h">h</option>
+                  <option value="v">v</option>
+                  <option value="hv">hv</option>
+                  <option value="all">all</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="field-help">
+              误差图颜色说明：
+              <span class="legend-chip green">绿色 = TP</span>
+              <span class="legend-chip red">红色 = FP</span>
+              <span class="legend-chip blue">蓝色 = FN</span>
+            </div>
+
+            <div class="actions">
+              <button id="run-button" type="submit">运行分割</button>
+              <div class="status-wrap">
+                <span id="status-text">Ready.</span>
+                <span id="status-hint">服务启动后，在当前浏览器直接推理。</span>
+              </div>
+            </div>
+          </form>
+        </section>
+
+        <section class="result-panel">
+          <div class="panel-head">
+            <h2>结果预览</h2>
+            <p>感染面积根据最终二值掩码直接计算；上传 GT 后会额外显示对比指标。</p>
+          </div>
+
+          <div class="metrics" id="metrics">
+            <article class="metric-card">
+              <span>感染面积</span>
+              <strong id="metric-area">-</strong>
+            </article>
+            <article class="metric-card">
+              <span>运行设备</span>
+              <strong id="metric-device">-</strong>
+            </article>
+            <article class="metric-card">
+              <span>TTA</span>
+              <strong id="metric-tta">-</strong>
+            </article>
+            <article class="metric-card">
+              <span>保存目录</span>
+              <strong id="metric-save">-</strong>
+            </article>
+          </div>
+
+          <div class="preview-grid">
+            <article class="preview-card">
+              <div class="preview-head">
+                <h3>Original</h3>
+                <a id="download-original" href="#" download="original.png">下载</a>
+              </div>
+              <img id="preview-original" alt="Original preview">
+            </article>
+            <article class="preview-card">
+              <div class="preview-head">
+                <h3>Pred Mask</h3>
+                <a id="download-mask" href="#" download="mask.png">下载</a>
+              </div>
+              <img id="preview-mask" alt="Predicted mask preview">
+            </article>
+            <article class="preview-card">
+              <div class="preview-head">
+                <h3>Pred Overlay</h3>
+                <a id="download-overlay" href="#" download="overlay.png">下载</a>
+              </div>
+              <img id="preview-overlay" alt="Predicted overlay preview">
+            </article>
+          </div>
+
+          <section id="compare-panel" class="compare-panel is-hidden">
+            <div class="panel-head compare-head">
+              <h2>真值对比</h2>
+              <p id="gt-source-text">检测到真值 mask 后显示这一部分。</p>
+            </div>
+
+            <div class="metrics compare-metrics">
+              <article class="metric-card">
+                <span>Dice</span>
+                <strong id="metric-dice">-</strong>
+              </article>
+              <article class="metric-card">
+                <span>IoU</span>
+                <strong id="metric-iou">-</strong>
+              </article>
+              <article class="metric-card">
+                <span>Precision</span>
+                <strong id="metric-precision">-</strong>
+              </article>
+              <article class="metric-card">
+                <span>Recall</span>
+                <strong id="metric-recall">-</strong>
+              </article>
+              <article class="metric-card">
+                <span>像素差异</span>
+                <strong id="metric-pixel-diff">-</strong>
+              </article>
+              <article class="metric-card">
+                <span>面积差</span>
+                <strong id="metric-area-gap">-</strong>
+              </article>
+            </div>
+
+            <div class="preview-grid compare-grid">
+              <article class="preview-card">
+                <div class="preview-head">
+                  <h3>GT Mask</h3>
+                  <a id="download-gt-mask" href="#" download="gt_mask.png">下载</a>
+                </div>
+                <img id="preview-gt-mask" alt="Ground truth mask preview">
+              </article>
+              <article class="preview-card">
+                <div class="preview-head">
+                  <h3>GT Overlay</h3>
+                  <a id="download-gt-overlay" href="#" download="gt_overlay.png">下载</a>
+                </div>
+                <img id="preview-gt-overlay" alt="Ground truth overlay preview">
+              </article>
+              <article class="preview-card">
+                <div class="preview-head">
+                  <h3>Error Map</h3>
+                  <a id="download-error-overlay" href="#" download="error_overlay.png">下载</a>
+                </div>
+                <img id="preview-error-overlay" alt="Error overlay preview">
+              </article>
+            </div>
+          </section>
+
+          <div class="saved-files" id="saved-files"></div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

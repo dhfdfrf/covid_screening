@@ -1,4 +1,5 @@
 import argparse
+import sys
 from pathlib import Path
 
 import cv2
@@ -6,6 +7,10 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 from tqdm import tqdm
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from src.datasets.qata_npz import QaTaNPZDataset
 from src.models.model_factory import ModelBuildConfig, build_model, available_models
@@ -82,7 +87,7 @@ def main():
         "--model",
         type=str,
         default="unet2d",
-        help=f"choices: {', '.join(list(available_models()) + ['transunet2d_v3', 'transunet2d_v4', 'transunet2d_v5', 'transunet2d_v6', 'transunet2d_v7', 'transunet2d_v8', 'transunet2d_v9', 'transunet2d_v10', 'transunet2d_v11', 'transunet2d_v12'])}",
+        help=f"choices: {', '.join(list(available_models()) + ['transunet2d_v3', 'transunet2d_v4', 'transunet2d_v5', 'transunet2d_v6', 'transunet2d_v7', 'transunet2d_v8', 'transunet2d_v9', 'transunet2d_v10', 'transunet2d_v11', 'transunet2d_v12', 'transunet2d_v13', 'transunet2d_v14', 'transunet2d_v16', 'transunet2d_v17', 'transunet2d_v18', 'transunet2d_v19', 'transunet2d_v20'])}",
     )
     ap.add_argument(
         "--img_size",
@@ -120,7 +125,49 @@ def main():
     img_size = _parse_hw(args.img_size)
     model_name = args.model.strip().lower()
 
-    if model_name in ("transunet2d_v12", "transunet_v12", "transunet2dv12"):
+    if model_name in ("transunet2d_v20", "transunet_v20", "transunet2dv20"):
+        from src.models.transunet2d_v20 import build_transunet2d_v20
+        model = build_transunet2d_v20(
+            in_channels=1,
+            out_channels=1,
+        ).to(device)
+    elif model_name in ("transunet2d_v19", "transunet_v19", "transunet2dv19"):
+        from src.models.transunet2d_v19 import build_transunet2d_v19
+        model = build_transunet2d_v19(
+            in_channels=1,
+            out_channels=1,
+        ).to(device)
+    elif model_name in ("transunet2d_v18", "transunet_v18", "transunet2dv18"):
+        from src.models.transunet2d_v18 import build_transunet2d_v18
+        model = build_transunet2d_v18(
+            in_channels=1,
+            out_channels=1,
+        ).to(device)
+    elif model_name in ("transunet2d_v17", "transunet_v17", "transunet2dv17"):
+        from src.models.transunet2d_v17 import build_transunet2d_v17
+        model = build_transunet2d_v17(
+            in_channels=1,
+            out_channels=1,
+        ).to(device)
+    elif model_name in ("transunet2d_v16", "transunet_v16", "transunet2dv16"):
+        from src.models.transunet2d_v16 import build_transunet2d_v16
+        model = build_transunet2d_v16(
+            in_channels=1,
+            out_channels=1,
+        ).to(device)
+    elif model_name in ("transunet2d_v14", "transunet_v14", "transunet2dv14"):
+        from src.models.transunet2d_v14 import build_transunet2d_v14
+        model = build_transunet2d_v14(
+            in_channels=1,
+            out_channels=1,
+        ).to(device)
+    elif model_name in ("transunet2d_v13", "transunet_v13", "transunet2dv13"):
+        from src.models.transunet2d_v13 import build_transunet2d_v13
+        model = build_transunet2d_v13(
+            in_channels=1,
+            out_channels=1,
+        ).to(device)
+    elif model_name in ("transunet2d_v12", "transunet_v12", "transunet2dv12"):
         from src.models.transunet2d_v12 import build_transunet2d_v12
         model = build_transunet2d_v12(
             in_channels=1,
